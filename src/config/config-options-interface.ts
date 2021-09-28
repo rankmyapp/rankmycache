@@ -4,6 +4,7 @@ export interface CacheOptions {
   type: CacheProviders;
   host: string;
   port: number;
-  password: string;
-  requestTimeout: number;
+  password?: string;
+  requestTimeout?: number;
+  keyPrefix?: string;
 }

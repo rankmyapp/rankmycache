@@ -8,11 +8,18 @@ export class IORedisAdapter implements CacheAdapter<Redis> {
 
   timeout: number;
 
-  constructor({ host, port, password, requestTimeout = 150 }: CacheOptions) {
+  constructor({
+    host,
+    port,
+    password,
+    keyPrefix = '',
+    requestTimeout = 150,
+  }: CacheOptions) {
     this.client = new IORedis({
       host,
       port,
       password,
+      keyPrefix,
       retryStrategy: () => null,
       reconnectOnError: () => false,
       connectTimeout: 200,
