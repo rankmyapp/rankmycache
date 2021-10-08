@@ -8,6 +8,8 @@ export class IORedisAdapter implements CacheAdapter<Redis> {
 
   timeout: number;
 
+  settings: Omit<CacheOptions, 'type'>;
+
   constructor({
     host,
     port,
@@ -15,24 +17,44 @@ export class IORedisAdapter implements CacheAdapter<Redis> {
     keyPrefix = '',
     requestTimeout = 150,
   }: CacheOptions) {
-    this.client = new IORedis({
+    this.settings = {
       host,
       port,
       password,
       keyPrefix,
-      retryStrategy: () => null,
-      reconnectOnError: () => false,
-      connectTimeout: 200,
-      keepAlive: 1000,
-    });
+    };
+    this.client = this.getInstance();
     // @ts-ignore
     IORedis.Promise = Bluebird;
     this.timeout = requestTimeout;
   }
 
+  private getInstance(): Redis | null {
+    try {
+      const instance = new IORedis({
+        ...this.settings,
+        retryStrategy: () => null,
+        reconnectOnError: () => false,
+        connectTimeout: 200,
+        keepAlive: 1000,
+      });
+
+      instance.on('error', (error) => this.handleError(error));
+      instance.on('close', () => this.disconnect());
+
+      return instance;
+    } catch {
+      return null;
+    }
+  }
+
   async get<T>(key: string): Promise<T> {
     try {
-      if (this.client.status !== 'ready') {
+      if (!this.client) {
+        this.client = this.getInstance();
+      }
+
+      if (this.client?.status !== 'ready') {
         return null;
       }
 
@@ -53,7 +75,11 @@ export class IORedisAdapter implements CacheAdapter<Redis> {
 
   async set<T>(key: string, data: T): Promise<void> {
     try {
-      if (this.client.status !== 'ready') {
+      if (!this.client) {
+        this.client = this.getInstance();
+      }
+
+      if (this.client?.status !== 'ready') {
         return null;
       }
 
@@ -73,7 +99,11 @@ export class IORedisAdapter implements CacheAdapter<Redis> {
 
   async delete(key: string): Promise<void> {
     try {
-      if (this.client.status !== 'ready') {
+      if (!this.client) {
+        this.client = this.getInstance();
+      }
+
+      if (this.client?.status !== 'ready') {
         return null;
       }
 
@@ -90,9 +120,13 @@ export class IORedisAdapter implements CacheAdapter<Redis> {
     }
   }
 
+  private disconnect() {
+    this.client = null;
+  }
+
   handleError(err: Error): null {
     if (err.message !== 'ERR_TIMEOUT') {
-      this.client = null;
+      this.disconnect();
     }
 
     return null;
