@@ -1,4 +1,4 @@
-import { CacheServiceInterface } from 'src/service/cache-interface';
+import { CacheServiceInterface } from '../../src/service/cache-interface';
 import { CacheProviders } from '../../src/enums';
 import { RankMyCache } from '../../src';
 
