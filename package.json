@@ -16,7 +16,7 @@
   },
   "scripts": {
     "build": "rm -rf dist && tsc",
-    "prepublishOnly": "yarn build",
+    "prepublishOnly": "yarn build && yarn test",
     "start:dev": "ts-node-dev --transpile-only --ignore-watch node_modules --respawn src/index.ts",
     "test": "jest",
     "test:watch": "yarn test --watchAll"

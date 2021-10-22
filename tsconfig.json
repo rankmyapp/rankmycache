@@ -12,5 +12,6 @@
     "baseUrl": "./",
     "incremental": true
   },
-  "exclude": ["test", "dist"]
+  "exclude": ["test", "dist"],
+  "include": ["src/**/*"]
 }
