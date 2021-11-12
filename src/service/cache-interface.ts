@@ -5,6 +5,6 @@ export interface CacheServiceInterface {
   cacheAdapter: CacheAdapter<AvailableProviders>;
 
   get<T>(key: string): Promise<T>;
-  set<T>(key: string, data: T): Promise<void>;
+  set<T>(key: string, data: T, secondsToExpire?: number | false): Promise<void>;
   delete(key: string): Promise<void>;
 }

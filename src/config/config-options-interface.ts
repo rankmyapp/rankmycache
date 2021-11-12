@@ -7,4 +7,5 @@ export interface CacheOptions {
   password?: string;
   requestTimeout?: number;
   keyPrefix?: string;
+  ttl?: number | false;
 }

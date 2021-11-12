@@ -15,8 +15,12 @@ export class RankMyCache implements CacheServiceInterface {
     return this.cacheAdapter.get<T>(key);
   }
 
-  set<T>(key: string, data: T): Promise<void> {
-    return this.cacheAdapter.set<T>(key, data);
+  set<T>(
+    key: string,
+    data: T,
+    secondsToExpire?: number | false,
+  ): Promise<void> {
+    return this.cacheAdapter.set<T>(key, data, secondsToExpire);
   }
 
   delete(key: string): Promise<void> {
