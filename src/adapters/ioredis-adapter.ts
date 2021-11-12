@@ -16,12 +16,14 @@ export class IORedisAdapter implements CacheAdapter<Redis> {
     password,
     keyPrefix = '',
     requestTimeout = 150,
+    ttl = false,
   }: CacheOptions) {
     this.settings = {
       host,
       port,
       password,
       keyPrefix,
+      ttl,
     };
     this.client = this.getInstance();
     // @ts-ignore
@@ -73,12 +75,11 @@ export class IORedisAdapter implements CacheAdapter<Redis> {
     }
   }
 
-  async set<T>(key: string, data: T): Promise<void> {
+  async set<T>(key: string, data: T, ttl = this.settings.ttl): Promise<void> {
     try {
       if (!this.client) {
         this.client = this.getInstance();
       }
-
       if (this.client?.status !== 'ready') {
         return null;
       }
@@ -86,7 +87,9 @@ export class IORedisAdapter implements CacheAdapter<Redis> {
       const encodedData = JSON.stringify(data);
 
       const redisPromise = (
-        this.client.set(key, encodedData) as Bluebird<'OK'>
+        ttl
+          ? (this.client.set(key, encodedData, 'EX', ttl) as Bluebird<'OK'>)
+          : (this.client.set(key, encodedData) as Bluebird<'OK'>)
       ).timeout(this.timeout, 'ERR_TIMEOUT');
 
       await redisPromise;

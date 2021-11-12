@@ -55,8 +55,9 @@ const cacheService = new RankMyCache({
   host: 'hostname',
   port: 6379,
   password: 'secret', // optional
-  keyPrefix: 'cache-' // optional
-  requestTimeout: 100 // optional
+  keyPrefix: 'cache-', // optional
+  requestTimeout: 100, // optional
+  ttl: 300 // default seconds to expire, is also optional 
 });
 ```
 
@@ -64,10 +65,23 @@ const cacheService = new RankMyCache({
 
 Sending data to your cache provider is done by sending the key related to the payload and, of course, the payload as a Object:
 ```typescript
+// without expiration
 await cacheService.set('new-data', {
   name: 'data',
   ok: true,
 });
+
+// with custom expiration time
+await cacheService.set('new-data', {
+  name: 'data',
+  ok: true,
+}, 500);
+
+// if you wish to override default expiration time and save cache data for an indefinite amount of time
+await cacheService.set('new-data', {
+  name: 'data',
+  ok: true,
+}, false);
 ```
 
 ### Getting Data
