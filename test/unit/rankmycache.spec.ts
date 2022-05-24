@@ -67,4 +67,69 @@ describe('RankMyCache', () => {
 
     expect(data).toBeNull();
   });
+
+  it('should add single item to set', async () => {
+    const setKey = 'test-set';
+    const item = 'test-item';
+
+    await rankMyCache.addToSet(setKey, item);
+
+    const setItems = await rankMyCache.getSetMembers(setKey);
+
+    expect(setItems).toEqual(expect.arrayContaining([item]));
+  });
+
+  it('should add multiple items to a set', async () => {
+    const setKey = 'test-set';
+    const items = ['test-item-1', 'test-item-2'];
+
+    await rankMyCache.addToSet(setKey, items);
+
+    const setItems = await rankMyCache.getSetMembers(setKey);
+
+    expect(setItems).toEqual(expect.arrayContaining(items));
+  });
+
+  it('should remove an item from a set', async () => {
+    const setKey = 'test-set';
+    const items = ['test-item-1', 'test-item-2'];
+
+    await rankMyCache.addToSet(setKey, items);
+
+    await rankMyCache.removeFromSet(setKey, items[0]);
+
+    const setItems = await rankMyCache.getSetMembers(setKey);
+
+    expect(setItems).not.toEqual(expect.arrayContaining([items[0]]));
+    expect(setItems).toEqual(expect.arrayContaining([items[1]]));
+  });
+
+  it('should remove multiple items from a set', async () => {
+    const setKey = 'test-set';
+    const items = ['test-item-1', 'test-item-2', 'test-item-3'];
+
+    await rankMyCache.addToSet(setKey, items);
+
+    await rankMyCache.removeFromSet(setKey, [items[0], items[1]]);
+
+    const setItems = await rankMyCache.getSetMembers(setKey);
+
+    expect(setItems).not.toEqual(expect.arrayContaining([items[0]]));
+    expect(setItems).not.toEqual(expect.arrayContaining([items[1]]));
+    expect(setItems).toEqual(expect.arrayContaining([items[2]]));
+  });
+
+  it('should check if an item is in a set', async () => {
+    const setKey = 'test-set';
+    const items = ['test-item-1', 'test-item-2', 'test-item-3'];
+    const itemNotIn = 'test-item-not-in';
+
+    await rankMyCache.addToSet(setKey, items);
+
+    await expect(rankMyCache.isSetMember(setKey, items[1])).resolves.toBe(true);
+
+    await expect(rankMyCache.isSetMember(setKey, itemNotIn)).resolves.toBe(
+      false,
+    );
+  });
 });
