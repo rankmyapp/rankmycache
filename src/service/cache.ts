@@ -26,4 +26,20 @@ export class RankMyCache implements CacheServiceInterface {
   delete(key: string): Promise<void> {
     return this.cacheAdapter.delete(key);
   }
+
+  getSetMembers(key: string): Promise<string[]> {
+    return this.cacheAdapter.getSetMembers(key);
+  }
+
+  addToSet<T>(key: string, value: T | T[]): Promise<void> {
+    return this.cacheAdapter.addToSet(key, value);
+  }
+
+  removeFromSet<T>(key: string, value: T | T[]): Promise<void> {
+    return this.cacheAdapter.removeFromSet(key, value);
+  }
+
+  isSetMember<T>(key: string, value: T | T[]): Promise<boolean> {
+    return this.cacheAdapter.isSetMember(key, value);
+  }
 }

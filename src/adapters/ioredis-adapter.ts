@@ -134,4 +134,96 @@ export class IORedisAdapter implements CacheAdapter<Redis> {
 
     return null;
   }
+
+  async getSetMembers(key: string): Promise<string[]> {
+    try {
+      if (!this.client) {
+        this.client = this.getInstance();
+      }
+
+      if (this.client?.status !== 'ready') {
+        return null;
+      }
+
+      const redisPromise = (
+        this.client.smembers(key) as Bluebird<string[]>
+      ).timeout(this.timeout, 'ERR_TIMEOUT');
+
+      const data = await redisPromise;
+
+      return data;
+    } catch (err) {
+      return this.handleError(err);
+    }
+  }
+
+  async addToSet<T>(key: string, value: T | T[]): Promise<void> {
+    try {
+      if (!this.client) {
+        this.client = this.getInstance();
+      }
+
+      if (this.client?.status !== 'ready') {
+        return null;
+      }
+
+      const valuesToAdd = Array.isArray(value) ? value : [value];
+
+      const redisPromise = (
+        this.client.sadd(key, valuesToAdd) as Bluebird<number>
+      ).timeout(this.timeout, 'ERR_TIMEOUT');
+
+      await redisPromise;
+
+      return null;
+    } catch (err) {
+      return this.handleError(err);
+    }
+  }
+
+  async removeFromSet<T>(key: string, value: T | T[]): Promise<void> {
+    try {
+      if (!this.client) {
+        this.client = this.getInstance();
+      }
+
+      if (this.client?.status !== 'ready') {
+        return null;
+      }
+
+      const valuesToAdd = Array.isArray(value) ? value : [value];
+
+      const redisPromise = (
+        this.client.srem(key, valuesToAdd) as Bluebird<number>
+      ).timeout(this.timeout, 'ERR_TIMEOUT');
+
+      await redisPromise;
+
+      return null;
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  async isSetMember<T>(key: string, value: T | T[]): Promise<boolean> {
+    try {
+      if (!this.client) {
+        this.client = this.getInstance();
+      }
+
+      if (this.client?.status !== 'ready') {
+        return null;
+      }
+
+      const redisPromise = (
+        this.client.sismember(key, String(value)) as Bluebird<number>
+      ).timeout(this.timeout, 'ERR_TIMEOUT');
+
+      const data = await redisPromise;
+
+      return Boolean(data);
+    } catch (err) {
+      return this.handleError(err);
+    }
+  }
 }
