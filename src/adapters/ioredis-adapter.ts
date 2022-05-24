@@ -191,10 +191,10 @@ export class IORedisAdapter implements CacheAdapter<Redis> {
         return null;
       }
 
-      const valuesToAdd = Array.isArray(value) ? value : [value];
+      const valuesToRemove = Array.isArray(value) ? value : [value];
 
       const redisPromise = (
-        this.client.srem(key, valuesToAdd) as Bluebird<number>
+        this.client.srem(key, valuesToRemove) as Bluebird<number>
       ).timeout(this.timeout, 'ERR_TIMEOUT');
 
       await redisPromise;
@@ -205,7 +205,7 @@ export class IORedisAdapter implements CacheAdapter<Redis> {
     }
   }
 
-  async isSetMember<T>(key: string, value: T | T[]): Promise<boolean> {
+  async isSetMember<T>(key: string, value: T): Promise<boolean> {
     try {
       if (!this.client) {
         this.client = this.getInstance();

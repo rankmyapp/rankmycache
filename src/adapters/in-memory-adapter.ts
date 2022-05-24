@@ -61,12 +61,12 @@ export class InMemoryAdapter implements CacheAdapter<InMemory> {
   }
 
   async removeFromSet<T>(key: string, value: T | T[]): Promise<void> {
-    const valuesToAdd = Array.isArray(value) ? value : [value];
+    const valuesToRemove = Array.isArray(value) ? value : [value];
 
     const foundSet = this.client[key];
 
     if (foundSet && foundSet instanceof Set) {
-      valuesToAdd.map((value) => foundSet.delete(value));
+      valuesToRemove.map((value) => foundSet.delete(value));
 
       if (foundSet.size === 0) {
         delete this.client[key];
