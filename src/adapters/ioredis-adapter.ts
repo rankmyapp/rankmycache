@@ -135,7 +135,7 @@ export class IORedisAdapter implements CacheAdapter<Redis> {
     return null;
   }
 
-  async getSetMembers(key: string): Promise<string[]> {
+  async getSetMembers(key: string): Promise<string[] | null> {
     try {
       if (!this.client) {
         this.client = this.getInstance();
@@ -151,7 +151,7 @@ export class IORedisAdapter implements CacheAdapter<Redis> {
 
       const data = await redisPromise;
 
-      return data;
+      return data.length > 0 ? data : null;
     } catch (err) {
       return this.handleError(err);
     }

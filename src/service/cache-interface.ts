@@ -9,7 +9,7 @@ export interface CacheServiceInterface {
   get<T>(key: string): Promise<T>;
   set<T>(key: string, data: T, secondsToExpire?: number | false): Promise<void>;
   delete(key: string): Promise<void>;
-  getSetMembers(key: string): Promise<string[]>;
+  getSetMembers(key: string): Promise<string[] | null>;
   addToSet<T extends SetValueType>(key: string, value: T | T[]): Promise<void>;
   removeFromSet<T extends SetValueType>(
     key: string,

@@ -37,7 +37,7 @@ export class InMemoryAdapter implements CacheAdapter<InMemory> {
     return null;
   }
 
-  async getSetMembers(key: string): Promise<string[]> {
+  async getSetMembers(key: string): Promise<string[] | null> {
     const foundSet = this.client[key];
 
     return (

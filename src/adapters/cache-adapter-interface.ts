@@ -7,7 +7,7 @@ export interface CacheAdapter<V> {
   set<T>(key: string, data: T, ttl?: number | false): Promise<void>;
   delete(key: string): Promise<void>;
   handleError(err: Error): null;
-  getSetMembers(key: string): Promise<string[]>;
+  getSetMembers(key: string): Promise<string[] | null>;
   addToSet<T extends SetValueType>(key: string, value: T | T[]): Promise<void>;
   removeFromSet<T extends SetValueType>(
     key: string,

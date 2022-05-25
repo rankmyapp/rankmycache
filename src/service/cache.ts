@@ -27,7 +27,7 @@ export class RankMyCache implements CacheServiceInterface {
     return this.cacheAdapter.delete(key);
   }
 
-  getSetMembers(key: string): Promise<string[]> {
+  getSetMembers(key: string): Promise<string[] | null> {
     return this.cacheAdapter.getSetMembers(key);
   }
 
