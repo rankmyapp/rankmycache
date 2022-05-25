@@ -1,3 +1,4 @@
+export type SetValueType = string | number;
 export interface CacheAdapter<V> {
   client: V;
   timeout: number;
@@ -7,7 +8,10 @@ export interface CacheAdapter<V> {
   delete(key: string): Promise<void>;
   handleError(err: Error): null;
   getSetMembers(key: string): Promise<string[]>;
-  addToSet<T>(key: string, value: T | T[]): Promise<void>;
-  removeFromSet<T>(key: string, value: T | T[]): Promise<void>;
-  isSetMember<T>(key: string, value: T): Promise<boolean>;
+  addToSet<T extends SetValueType>(key: string, value: T | T[]): Promise<void>;
+  removeFromSet<T extends SetValueType>(
+    key: string,
+    value: T | T[],
+  ): Promise<void>;
+  isSetMember<T extends SetValueType>(key: string, value: T): Promise<boolean>;
 }

@@ -2,7 +2,7 @@ import { CacheAdapter } from '../adapters/cache-adapter-interface';
 import { AvailableProviders } from '../adapters/cache-adapters';
 import { availableProviders } from '../adapters/cache-providers';
 import { CacheOptions } from '../config/config-options-interface';
-import { CacheServiceInterface } from './cache-interface';
+import { CacheServiceInterface, SetValueType } from './cache-interface';
 
 export class RankMyCache implements CacheServiceInterface {
   cacheAdapter: CacheAdapter<AvailableProviders>;
@@ -31,15 +31,18 @@ export class RankMyCache implements CacheServiceInterface {
     return this.cacheAdapter.getSetMembers(key);
   }
 
-  addToSet<T>(key: string, value: T | T[]): Promise<void> {
+  addToSet<T extends SetValueType>(key: string, value: T | T[]): Promise<void> {
     return this.cacheAdapter.addToSet(key, value);
   }
 
-  removeFromSet<T>(key: string, value: T | T[]): Promise<void> {
+  removeFromSet<T extends SetValueType>(
+    key: string,
+    value: T | T[],
+  ): Promise<void> {
     return this.cacheAdapter.removeFromSet(key, value);
   }
 
-  isSetMember<T>(key: string, value: T): Promise<boolean> {
+  isSetMember<T extends SetValueType>(key: string, value: T): Promise<boolean> {
     return this.cacheAdapter.isSetMember(key, value);
   }
 }

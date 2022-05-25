@@ -1,7 +1,7 @@
 import * as Bluebird from 'bluebird';
 import IORedis, { Redis } from 'ioredis';
 import { CacheOptions } from '../config/config-options-interface';
-import { CacheAdapter } from './cache-adapter-interface';
+import { CacheAdapter, SetValueType } from './cache-adapter-interface';
 
 export class IORedisAdapter implements CacheAdapter<Redis> {
   client: Redis;
@@ -157,7 +157,10 @@ export class IORedisAdapter implements CacheAdapter<Redis> {
     }
   }
 
-  async addToSet<T>(key: string, value: T | T[]): Promise<void> {
+  async addToSet<T extends SetValueType>(
+    key: string,
+    value: T | T[],
+  ): Promise<void> {
     try {
       if (!this.client) {
         this.client = this.getInstance();
@@ -181,7 +184,10 @@ export class IORedisAdapter implements CacheAdapter<Redis> {
     }
   }
 
-  async removeFromSet<T>(key: string, value: T | T[]): Promise<void> {
+  async removeFromSet<T extends SetValueType>(
+    key: string,
+    value: T | T[],
+  ): Promise<void> {
     try {
       if (!this.client) {
         this.client = this.getInstance();
@@ -205,7 +211,10 @@ export class IORedisAdapter implements CacheAdapter<Redis> {
     }
   }
 
-  async isSetMember<T>(key: string, value: T): Promise<boolean> {
+  async isSetMember<T extends SetValueType>(
+    key: string,
+    value: T,
+  ): Promise<boolean> {
     try {
       if (!this.client) {
         this.client = this.getInstance();

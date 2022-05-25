@@ -1,4 +1,4 @@
-import { CacheAdapter } from './cache-adapter-interface';
+import { CacheAdapter, SetValueType } from './cache-adapter-interface';
 
 export type InMemory = {
   [key: string]: string | Set<unknown>;
@@ -48,7 +48,10 @@ export class InMemoryAdapter implements CacheAdapter<InMemory> {
     );
   }
 
-  async addToSet<T>(key: string, value: T | T[]): Promise<void> {
+  async addToSet<T extends SetValueType>(
+    key: string,
+    value: T | T[],
+  ): Promise<void> {
     const valuesToAdd = Array.isArray(value) ? value : [value];
 
     const foundSet = this.client[key];
@@ -60,7 +63,10 @@ export class InMemoryAdapter implements CacheAdapter<InMemory> {
     }
   }
 
-  async removeFromSet<T>(key: string, value: T | T[]): Promise<void> {
+  async removeFromSet<T extends SetValueType>(
+    key: string,
+    value: T | T[],
+  ): Promise<void> {
     const valuesToRemove = Array.isArray(value) ? value : [value];
 
     const foundSet = this.client[key];
@@ -74,7 +80,10 @@ export class InMemoryAdapter implements CacheAdapter<InMemory> {
     }
   }
 
-  async isSetMember<T>(key: string, value: T): Promise<boolean> {
+  async isSetMember<T extends SetValueType>(
+    key: string,
+    value: T,
+  ): Promise<boolean> {
     const foundSet = this.client[key];
 
     return foundSet && foundSet instanceof Set && foundSet.has(value);
