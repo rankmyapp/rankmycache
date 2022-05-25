@@ -1,7 +1,7 @@
 import * as Bluebird from 'bluebird';
 import IORedis, { Redis } from 'ioredis';
 import { CacheOptions } from '../config/config-options-interface';
-import { CacheAdapter } from './cache-adapter-interface';
+import { CacheAdapter, SetValueType } from './cache-adapter-interface';
 
 export class IORedisAdapter implements CacheAdapter<Redis> {
   client: Redis;
@@ -133,5 +133,128 @@ export class IORedisAdapter implements CacheAdapter<Redis> {
     }
 
     return null;
+  }
+
+  async getSetMembers(key: string): Promise<string[] | null> {
+    try {
+      if (!this.client) {
+        this.client = this.getInstance();
+      }
+
+      if (this.client?.status !== 'ready') {
+        return null;
+      }
+
+      const redisPromise = (
+        this.client.smembers(key) as Bluebird<string[]>
+      ).timeout(this.timeout, 'ERR_TIMEOUT');
+
+      const data = await redisPromise;
+
+      return data.length > 0 ? data : null;
+    } catch (err) {
+      return this.handleError(err);
+    }
+  }
+
+  async addToSet<T extends SetValueType>(
+    key: string,
+    value: T | T[],
+  ): Promise<void> {
+    try {
+      if (!this.client) {
+        this.client = this.getInstance();
+      }
+
+      if (this.client?.status !== 'ready') {
+        return null;
+      }
+
+      const valuesToAdd = Array.isArray(value) ? value : [value];
+
+      const redisPromise = (
+        this.client.sadd(key, valuesToAdd) as Bluebird<number>
+      ).timeout(this.timeout, 'ERR_TIMEOUT');
+
+      await redisPromise;
+
+      return null;
+    } catch (err) {
+      return this.handleError(err);
+    }
+  }
+
+  async removeFromSet<T extends SetValueType>(
+    key: string,
+    value: T | T[],
+  ): Promise<void> {
+    try {
+      if (!this.client) {
+        this.client = this.getInstance();
+      }
+
+      if (this.client?.status !== 'ready') {
+        return null;
+      }
+
+      const valuesToRemove = Array.isArray(value) ? value : [value];
+
+      const redisPromise = (
+        this.client.srem(key, valuesToRemove) as Bluebird<number>
+      ).timeout(this.timeout, 'ERR_TIMEOUT');
+
+      await redisPromise;
+
+      return null;
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  async isSetMember<T extends SetValueType>(
+    key: string,
+    value: T,
+  ): Promise<boolean> {
+    try {
+      if (!this.client) {
+        this.client = this.getInstance();
+      }
+
+      if (this.client?.status !== 'ready') {
+        return null;
+      }
+
+      const redisPromise = (
+        this.client.sismember(key, String(value)) as Bluebird<number>
+      ).timeout(this.timeout, 'ERR_TIMEOUT');
+
+      const data = await redisPromise;
+
+      return Boolean(data);
+    } catch (err) {
+      return this.handleError(err);
+    }
+  }
+
+  async expire(key: string, ttl: number): Promise<void> {
+    try {
+      if (!this.client) {
+        this.client = this.getInstance();
+      }
+
+      if (this.client?.status !== 'ready') {
+        return null;
+      }
+
+      const redisPromise = (
+        this.client.expire(key, ttl) as Bluebird<number>
+      ).timeout(this.timeout, 'ERR_TIMEOUT');
+
+      await redisPromise;
+
+      return null;
+    } catch (err) {
+      return this.handleError(err);
+    }
   }
 }

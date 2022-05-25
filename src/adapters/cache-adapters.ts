@@ -1,7 +1,4 @@
 import { Redis } from 'ioredis';
-
-type InMemory = {
-  [key: string]: string;
-};
+import { InMemory } from './in-memory-adapter';
 
 export type AvailableProviders = Redis | InMemory;

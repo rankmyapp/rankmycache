@@ -13,7 +13,13 @@ An easy-to-use cache providing service.
   * [Setting Data](#setting-data)
   * [Getting Data](#getting-data)
   * [Deleting Data](#deleting-data)
-  * [Handling Errors](#handling-errors)
+* [Using Sets](#using-sets)
+  * [Add To Set](#add-to-set)
+  * [Get Set Members](#get-set-members)
+  * [Remove From Set](#remove-from-set)
+  * [Is Set Member](#is-set-member)
+* [Expiring Data](#expiring-data)
+* [Handling Errors](#handling-errors)
 
 ## Instalation
 
@@ -105,6 +111,83 @@ console.log(data);
 Deleting data is also pretty simple, just pass the key and it'll go away:
 ```typescript
 await cacheService.delete('new-data');
+```
+
+## Using Sets
+
+It is also possible to store sets of **unique** data in your cache. By adding data to a set, the cache will create an array of unique items to add your data.
+
+### Add To Set
+
+To create a new set and populate it with data, or to add data to an existing set, use the `addToSet` method. It can handle adding a single item or an array of items and it will automatically handle creating the set if it doesn't exist:
+
+```ts
+// Adding a single item
+await cacheService.addToSet('set-key', 'set-item');
+
+// Adding multiple items
+await cacheService.addToSet('set-key', ['set-item-1', 'set-item-2']);
+```
+### Get Set Members
+
+To access all items in a set of data and return them as an array, use the `getSetMembers` method:
+
+```ts
+await cacheService.addToSet('set-key', ['set-item-1', 'set-item-2']);
+
+// Querying set data
+const items = await cacheService.getSetMembers('set-key');
+
+console.log(items) // ['set-item-1', 'set-item-2']
+```
+
+### Remove From Set
+
+To remove items from a set, use the `removeFromSet` method. Just like `addToSet`, it can also recieve an item or an array of items to be removed:
+
+```ts
+await cacheService.addToSet('set-key', ['item-1', 'item-2', 'item-3', 'item-4']);
+
+// Removing single item
+await cacheService.removeFromSet('set-key', 'item-3');
+
+// Removing multiple items at once
+await cacheService.removeFromSet('set-key', ['item-1', 'item-2']);
+
+const items = await cacheService.getSetMembers('set-key');
+
+console.log(items) // ['item-4']
+```
+
+### Is Set Member
+
+To check if an item is a member of a given set, use the `isSetMember` method:
+
+```ts
+await cacheService.addToSet('set-key', ['item-1', 'item-2']);
+
+const isMember = await cacheService.isSetMember('set-key', 'item-2');
+
+console.log(isMember); // true
+```
+
+## Expiring Data
+
+It is possible to add an expiration time to your key by using the `expire` method. The time should be in seconds and the key will be removed at the end. **In case the `expire` method is used on a Set key, the entire set will be deleted.**
+
+```ts
+// Adding expiration time to a regular cache register
+await cacheService.set('new-data', {
+  name: 'data',
+  ok: true,
+});
+
+await cacheService.expire('new-data', 5) // Will be deleted after 5 seconds
+
+// Adding expiration time to a Set
+await cacheService.addToSet('set-key', ['item-1', 'item-2']);
+
+await cacheService.expire('set-key', 5) // Will be deleted after 5 seconds
 ```
 
 ## Handling Errors

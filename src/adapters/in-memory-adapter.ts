@@ -1,7 +1,7 @@
-import { CacheAdapter } from './cache-adapter-interface';
+import { CacheAdapter, SetValueType } from './cache-adapter-interface';
 
-type InMemory = {
-  [key: string]: string;
+export type InMemory = {
+  [key: string]: string | Set<unknown>;
 };
 
 export class InMemoryAdapter implements CacheAdapter<InMemory> {
@@ -12,7 +12,7 @@ export class InMemoryAdapter implements CacheAdapter<InMemory> {
   async get<T>(key: string): Promise<T> {
     const data = this.client[key];
 
-    if (!data) {
+    if (!data || data instanceof Set) {
       return null;
     }
 
@@ -35,5 +35,63 @@ export class InMemoryAdapter implements CacheAdapter<InMemory> {
     }
 
     return null;
+  }
+
+  async getSetMembers(key: string): Promise<string[] | null> {
+    const foundSet = this.client[key];
+
+    return (
+      (foundSet &&
+        foundSet instanceof Set &&
+        Array.from(foundSet).map(String)) ||
+      null
+    );
+  }
+
+  async addToSet<T extends SetValueType>(
+    key: string,
+    value: T | T[],
+  ): Promise<void> {
+    const valuesToAdd = Array.isArray(value) ? value : [value];
+
+    const foundSet = this.client[key];
+
+    if (foundSet && foundSet instanceof Set) {
+      valuesToAdd.map((value) => foundSet.add(value));
+    } else {
+      this.client[key] = new Set(valuesToAdd);
+    }
+  }
+
+  async removeFromSet<T extends SetValueType>(
+    key: string,
+    value: T | T[],
+  ): Promise<void> {
+    const valuesToRemove = Array.isArray(value) ? value : [value];
+
+    const foundSet = this.client[key];
+
+    if (foundSet && foundSet instanceof Set) {
+      valuesToRemove.map((value) => foundSet.delete(value));
+
+      if (foundSet.size === 0) {
+        delete this.client[key];
+      }
+    }
+  }
+
+  async isSetMember<T extends SetValueType>(
+    key: string,
+    value: T,
+  ): Promise<boolean> {
+    const foundSet = this.client[key];
+
+    return foundSet && foundSet instanceof Set && foundSet.has(value);
+  }
+
+  async expire(key: string, ttl: number): Promise<void> {
+    setTimeout(() => {
+      delete this.client[key];
+    }, ttl * 1000);
   }
 }
