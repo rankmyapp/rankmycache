@@ -88,4 +88,10 @@ export class InMemoryAdapter implements CacheAdapter<InMemory> {
 
     return foundSet && foundSet instanceof Set && foundSet.has(value);
   }
+
+  async expire(key: string, ttl: number): Promise<void> {
+    setTimeout(() => {
+      delete this.client[key];
+    }, ttl * 1000);
+  }
 }

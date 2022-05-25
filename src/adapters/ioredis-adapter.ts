@@ -235,4 +235,26 @@ export class IORedisAdapter implements CacheAdapter<Redis> {
       return this.handleError(err);
     }
   }
+
+  async expire(key: string, ttl: number): Promise<void> {
+    try {
+      if (!this.client) {
+        this.client = this.getInstance();
+      }
+
+      if (this.client?.status !== 'ready') {
+        return null;
+      }
+
+      const redisPromise = (
+        this.client.expire(key, ttl) as Bluebird<number>
+      ).timeout(this.timeout, 'ERR_TIMEOUT');
+
+      await redisPromise;
+
+      return null;
+    } catch (err) {
+      return this.handleError(err);
+    }
+  }
 }

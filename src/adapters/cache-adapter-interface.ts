@@ -14,4 +14,5 @@ export interface CacheAdapter<V> {
     value: T | T[],
   ): Promise<void>;
   isSetMember<T extends SetValueType>(key: string, value: T): Promise<boolean>;
+  expire(key: string, ttl: number): Promise<void>;
 }

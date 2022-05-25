@@ -45,4 +45,8 @@ export class RankMyCache implements CacheServiceInterface {
   isSetMember<T extends SetValueType>(key: string, value: T): Promise<boolean> {
     return this.cacheAdapter.isSetMember(key, value);
   }
+
+  expire(key: string, secondsToExpire: number): Promise<void> {
+    return this.cacheAdapter.expire(key, secondsToExpire);
+  }
 }

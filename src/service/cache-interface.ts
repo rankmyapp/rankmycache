@@ -16,4 +16,5 @@ export interface CacheServiceInterface {
     value: T | T[],
   ): Promise<void>;
   isSetMember<T extends SetValueType>(key: string, value: T): Promise<boolean>;
+  expire(key: string, secondsToExpire: number): Promise<void>;
 }

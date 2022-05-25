@@ -18,6 +18,7 @@ An easy-to-use cache providing service.
   * [Get Set Members](#get-set-members)
   * [Remove From Set](#remove-from-set)
   * [Is Set Member](#is-set-member)
+* [Expiring Data](#expiring-data)
 * [Handling Errors](#handling-errors)
 
 ## Instalation
@@ -169,6 +170,26 @@ const isMember = await cacheService.isSetMember('set-key', 'item-2');
 
 console.log(isMember); // true
 ```
+
+## Expiring Data
+
+It is possible to add an expiration time to your key by using the `expire` method. The time should be in seconds and the key will be removed at the end. **In case the `expire` method is used on a Set key, the entire set will be deleted.**
+
+```ts
+// Adding expiration time to a regular cache register
+await cacheService.set('new-data', {
+  name: 'data',
+  ok: true,
+});
+
+await cacheService.expire('new-data', 5) // Will be deleted after 5 seconds
+
+// Adding expiration time to a Set
+await cacheService.addToSet('set-key', ['item-1', 'item-2']);
+
+await cacheService.expire('set-key', 5) // Will be deleted after 5 seconds
+```
+
 ## Handling Errors
 
 One of the core concepts of using cache in an application is to function as a fallback for when data is already stored there, working as a faster, secondary source of data. Therefore, it shouldn't be neither slow nor throw errors when data is not available or it exceeds the request's timeout set previously. The cache service provided by this library knows this and won't throw errors when any kind of problem occurs, be it small, like exceeding the timeout, or major, like disconnecting from provider. Instead, it'll just return null when any request made by the service throws an error.
