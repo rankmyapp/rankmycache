@@ -132,4 +132,29 @@ describe('RankMyCache', () => {
       false,
     );
   });
+
+  it('should expire a cache after a given time', async () => {
+    const cacheKey = 'test-set';
+    const cacheSet = ['1', '2', '3'];
+
+    await rankMyCache.addToSet(cacheKey, cacheSet);
+
+    await rankMyCache.expire(cacheKey, 1);
+
+    let data = await rankMyCache.getSetMembers(cacheKey);
+
+    expect(data).toEqual(expect.arrayContaining(cacheSet));
+
+    // Wait 2 seconds
+    await new Promise((res) => {
+      setTimeout(
+        res,
+        2 * 1000, // 2 seconds
+      );
+    });
+
+    data = await rankMyCache.getSetMembers(cacheKey);
+
+    expect(data).toBeNull();
+  });
 });
