@@ -39,7 +39,7 @@ export class RankMyCache implements CacheServiceInterface {
     return this.cacheAdapter.removeFromSet(key, value);
   }
 
-  isSetMember<T>(key: string, value: T | T[]): Promise<boolean> {
+  isSetMember<T>(key: string, value: T): Promise<boolean> {
     return this.cacheAdapter.isSetMember(key, value);
   }
 }

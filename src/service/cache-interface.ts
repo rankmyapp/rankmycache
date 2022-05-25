@@ -10,5 +10,5 @@ export interface CacheServiceInterface {
   getSetMembers(key: string): Promise<string[]>;
   addToSet<T>(key: string, value: T | T[]): Promise<void>;
   removeFromSet<T>(key: string, value: T | T[]): Promise<void>;
-  isSetMember<T>(key: string, value: T | T[]): Promise<boolean>;
+  isSetMember<T>(key: string, value: T): Promise<boolean>;
 }
