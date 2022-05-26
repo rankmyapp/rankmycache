@@ -22,6 +22,6 @@ jobs:
 
       - run: yarn build
 
-      - run: yarn publish --access=public
+      - run: yarn publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
